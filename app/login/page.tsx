@@ -1,12 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import "./login.css";
 
+// Komponen Utama
 export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="login-container">Memuat Halaman...</div>}>
+      <LoginForm />
+    </Suspense>
+  );
+}
+
+// Komponen Form yang dipisahkan agar bisa menggunakan Suspense
+function LoginForm() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -24,21 +34,18 @@ export default function LoginPage() {
     });
   };
 
-// ... (kode atas tetap sama)
-
-  async function handleLogin(e: any) {
+  async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setErrorMsg("");
 
-    // --- LANGKAH 1: COBA LOGIN VIA SUPABASE AUTH ---
+    // --- LANGKAH 1: LOGIN VIA SUPABASE AUTH ---
     const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
       email: email,
       password: password,
     });
 
     if (!authError && authData.user) {
-      // Jika login via Auth berhasil, kita juga simpan emailnya agar sinkron
-      localStorage.setItem("userEmail", email); // <-- TAMBAHKAN INI
+      localStorage.setItem("userEmail", email);
 
       const { data: adminData } = await supabase
         .from("User")
@@ -52,8 +59,8 @@ export default function LoginPage() {
       }
     }
 
-    // --- LANGKAH 2: JIKA AUTH GAGAL, CEK TABEL USER MANUAL ---
-    const { data: userData, error: userError } = await supabase
+    // --- LANGKAH 2: CEK TABEL USER MANUAL ---
+    const { data: userData } = await supabase
       .from("User")
       .select("*")
       .eq("email", email)
@@ -66,17 +73,13 @@ export default function LoginPage() {
         return;
       }
 
-      // KUNCI PERBAIKAN: Simpan email ke localStorage sebelum pindah halaman
-      localStorage.setItem("userEmail", email); // <-- TAMBAHKAN INI
-
+      localStorage.setItem("userEmail", email);
       redirectUser(userData.role);
     } else {
       setErrorMsg("Email atau password salah.");
     }
   }
 
-// ... (kode sisanya tetap sama)
-  // Fungsi pembantu untuk arahkan halaman sesuai role
   function redirectUser(userRole: string) {
     if (userRole === 'admin') {
       router.push("/admin/dosen");
