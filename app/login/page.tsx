@@ -15,7 +15,7 @@ export default function LoginPage() {
   );
 }
 
-// Komponen Form yang dipisahkan agar bisa menggunakan Suspense
+// Komponen Form
 function LoginForm() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -156,6 +156,25 @@ function LoginForm() {
             />
             Login melalui Google
           </button>
+
+          {/* TOMBOL KEMBALI PILIH ROLE */}
+          <div style={{ marginTop: '20px', textAlign: 'center' }}>
+            <button 
+              type="button" 
+              onClick={() => router.push('/')} 
+              style={{ 
+                background: 'none', 
+                border: 'none', 
+                color: '#007bff', 
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: '500',
+                textDecoration: 'underline'
+              }}
+            >
+              ← Kembali Pilih Role
+            </button>
+          </div>
         </form>
       </div>
     </div>
