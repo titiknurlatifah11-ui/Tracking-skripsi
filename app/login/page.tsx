@@ -161,7 +161,7 @@ function LoginForm() {
           <div style={{ marginTop: '20px', textAlign: 'center' }}>
             <button 
               type="button" 
-              onClick={() => router.push('/')} 
+              onClick={() => router.push('/role')} 
               style={{ 
                 background: 'none', 
                 border: 'none', 
